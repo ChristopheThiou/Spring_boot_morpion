@@ -1,7 +1,7 @@
 package com.boardgame.morpion.Plugin;
 
 import fr.le_campus_numerique.square_games.engine.Game;
-import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
+import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;
 import java.util.Locale;
 import java.util.OptionalInt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class TicTacToePlugin implements GamePlugin {
+public class TaquinPlugin implements GamePlugin {
 
     @Autowired
-    private TicTacToeGameFactory ticTacToeGameFactory;
+    private TaquinGameFactory taquinGameFactory;
 
-    @Value("${game.tictactoe.default-player-count}")
+    @Value("${game.taquin.default-player-count}")
     private int defaultPlayerCount;
 
     @Autowired
@@ -24,13 +24,13 @@ public class TicTacToePlugin implements GamePlugin {
 
     @Override
     public String getName(Locale locale) {
-        return messageSource.getMessage("game.tictactoe.name", null, locale);
+        return messageSource.getMessage("game.taquin.name", null, locale);
     }
 
     @Override
     public Game createGame(OptionalInt playerCount, OptionalInt boardSize) {
         int players = playerCount.orElse(defaultPlayerCount);
-        int size = boardSize.orElse(3); // Taille par défaut
-        return ticTacToeGameFactory.createGame(players, size);
+        int size = boardSize.orElse(3);
+        return taquinGameFactory.createGame(players, size);
     }
 }

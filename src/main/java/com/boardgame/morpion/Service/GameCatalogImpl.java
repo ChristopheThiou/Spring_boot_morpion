@@ -1,10 +1,11 @@
 package com.boardgame.morpion.Service;
 
+import com.boardgame.morpion.Dao.GameDao;
 import com.boardgame.morpion.Plugin.GamePlugin;
 import fr.le_campus_numerique.square_games.engine.CellPosition;
+import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
 import fr.le_campus_numerique.square_games.engine.Token;
-import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGame;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,8 @@ public class GameCatalogImpl implements GameCatalog {
     @Autowired
     private List<GamePlugin> gamePlugins;
 
-    private Map<UUID, TicTacToeGame> games = new HashMap<>();
+    @Autowired
+    private GameDao gameDao;
 
     @Override
     public Collection<String> getGameIdentifier() {
@@ -27,31 +29,28 @@ public class GameCatalogImpl implements GameCatalog {
     }
 
     @Override
-    public TicTacToeGame createGame(int playerCount, int boardSize, Set<UUID> playerIds) {
+    public Game createGame(String gameId, int playerCount, int boardSize, Set<UUID> playerIds) {
         GamePlugin plugin = gamePlugins.stream()
-                .filter(p -> p.getName(Locale.getDefault()).equalsIgnoreCase("Tic Tac Toe"))
+                .filter(p -> p.getName(Locale.getDefault()).equalsIgnoreCase(gameId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid game ID"));
-        TicTacToeGame game = (TicTacToeGame) plugin.createGame(OptionalInt.of(playerCount), OptionalInt.of(boardSize));
-        games.put(game.getId(), game);
+        Game game = plugin.createGame(OptionalInt.of(playerCount), OptionalInt.of(boardSize));
+        gameDao.upsert(game);
         return game;
     }
 
     @Override
-    public List<TicTacToeGame> getGamesForPlayer(UUID playerId) {
-        List<TicTacToeGame> playerGames = new ArrayList<>();
-        for (TicTacToeGame game : games.values()) {
-            if (game.getPlayerIds().contains(playerId)) {
-                playerGames.add(game);
-            }
-        }
-        return playerGames;
+    public List<Game> getGamesForPlayer(UUID playerId) {
+        return gameDao.findAll()
+                .filter(game -> game.getPlayerIds().contains(playerId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void playMove(UUID gameId, UUID playerId, int x, int y) {
-        TicTacToeGame game = games.get(gameId);
-        if (game != null && game.getCurrentPlayerId().equals(playerId)) {
+        Game game = gameDao.findById(gameId.toString())
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+        if (game.getCurrentPlayerId().equals(playerId)) {
             CellPosition position = new CellPosition(x, y);
             Token token = game.getRemainingTokens().stream()
                     .filter(t -> t.getOwnerId().orElse(null).equals(playerId))
@@ -59,6 +58,7 @@ public class GameCatalogImpl implements GameCatalog {
                     .orElseThrow(() -> new IllegalArgumentException("No token available for the player"));
             try {
                 token.moveTo(position);
+                gameDao.upsert(game); // Update the game state after the move
             } catch (InvalidPositionException e) {
                 throw new RuntimeException(e);
             }
