@@ -34,7 +34,10 @@ public class GameCatalogImpl implements GameCatalog {
                 .filter(p -> p.getName(Locale.getDefault()).equalsIgnoreCase(gameId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid game ID"));
-        Game game = plugin.createGame(OptionalInt.of(playerCount), OptionalInt.of(boardSize));
+        UUID userId = playerIds.iterator().next();
+        playerIds.remove(userId);
+        UUID opponentIds = playerIds.iterator().next();
+        Game game = plugin.createGame(OptionalInt.of(playerCount), OptionalInt.of(boardSize), OptionalInt.empty(), OptionalInt.empty(), userId, opponentIds);
         gameDao.upsert(game);
         return game;
     }

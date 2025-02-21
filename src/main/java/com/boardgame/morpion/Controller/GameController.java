@@ -1,12 +1,13 @@
 package com.boardgame.morpion.Controller;
 
+import com.boardgame.morpion.Dto.GameDto;
 import com.boardgame.morpion.Service.GameCatalog;
 import com.boardgame.morpion.Service.UserService;
 import fr.le_campus_numerique.square_games.engine.Game;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +22,27 @@ public class GameController {
     private UserService userService;
 
     @PostMapping
-    public Game createGame(@RequestBody CreateGameRequest request, @RequestHeader("X-UserId") String userId) {
+    public Game createGame(@RequestBody GameDto request, @RequestHeader("X-UserId") String userId) {
         if (!userService.verifyUserId(userId)) {
             throw new IllegalArgumentException("Invalid user ID");
         }
-        Set<UUID> playerIds = request.getOpponentIds().stream()
-                                     .map(UUID::fromString)
-                                     .collect(Collectors.toSet());
+
+        // Séparez les opponentIds et vérifiez qu'il y a exactement un joueur
+        String[] opponentIdsArray = request.getOpponentIds().split(",");
+        if (opponentIdsArray.length != 1) {
+            throw new IllegalArgumentException("opponentIds must contain exactly one player");
+        }
+
+        Set<UUID> playerIds = new HashSet<>();
         playerIds.add(UUID.fromString(userId));
+        for (String opponentId : opponentIdsArray) {
+            playerIds.add(UUID.fromString(opponentId));
+        }
+
+        if (playerIds.size() != 2) {
+            throw new IllegalArgumentException("There must be exactly two distinct players");
+        }
+
         return gameCatalog.createGame(request.getGameId(), request.getPlayerCount(), request.getBoardSize(), playerIds);
     }
 
@@ -48,44 +62,5 @@ public class GameController {
         }
         UUID playerId = UUID.fromString(userId);
         gameCatalog.playMove(gameId, playerId, x, y);
-    }
-}
-
-class CreateGameRequest {
-    private String gameId;
-    private int playerCount;
-    private int boardSize;
-    private Set<String> opponentIds;
-
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-    }
-
-    public int getPlayerCount() {
-        return playerCount;
-    }
-
-    public void setPlayerCount(int playerCount) {
-        this.playerCount = playerCount;
-    }
-
-    public int getBoardSize() {
-        return boardSize;
-    }
-
-    public void setBoardSize(int boardSize) {
-        this.boardSize = boardSize;
-    }
-
-    public Set<String> getOpponentIds() {
-        return opponentIds;
-    }
-
-    public void setOpponentIds(Set<String> opponentIds) {
-        this.opponentIds = opponentIds;
     }
 }

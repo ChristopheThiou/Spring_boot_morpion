@@ -1,19 +1,21 @@
 package com.boardgame.morpion.Entity;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.util.List;
+
+
 
 @Entity
 public class GameEntity {
     @Id
     public String id;
-
-    public @NotNull String factoryId;
-    public @Positive int boardSize;
-    public @NotNull String playerIds;
-    public @NotNull String status;
+    public String factoryId;
+    public int boardSize;
+    public String playerIds;
+    public String status;
     public String currentPlayerId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
