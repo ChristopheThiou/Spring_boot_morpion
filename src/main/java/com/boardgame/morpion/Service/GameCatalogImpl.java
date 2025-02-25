@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 
+
 @Service
 public class GameCatalogImpl implements GameCatalog {
 
@@ -41,14 +42,7 @@ public class GameCatalogImpl implements GameCatalog {
         Game game = plugin.createGame(OptionalInt.of(playerCount), OptionalInt.of(boardSize), OptionalInt.empty(), OptionalInt.empty(), userId, opponentIds);
 
         gameDao.upsert(game);
-        
-        var savedGame = gameDao.findById(game.getId().toString()).orElseThrow();
-
-        // Ajout de journaux pour le débogage
-        System.out.println("Created game with ID: " + savedGame.getId());
-        System.out.println("Remaining Tokens: " + savedGame.getRemainingTokens());
-
-        return savedGame;
+        return game;
     }
 
     @Override
@@ -103,47 +97,39 @@ public class GameCatalogImpl implements GameCatalog {
 
     private Game createUpdatedGame(Game game, UUID newCurrentPlayerId) {
         return new Game() {
-            @Override
+
             public UUID getId() {
                 return game.getId();
             }
 
-            @Override
             public String getFactoryId() {
                 return game.getFactoryId();
             }
 
-            @Override
             public Set<UUID> getPlayerIds() {
                 return game.getPlayerIds();
             }
 
-            @Override
             public GameStatus getStatus() {
                 return game.getStatus();
             }
 
-            @Override
             public UUID getCurrentPlayerId() {
                 return newCurrentPlayerId;
             }
 
-            @Override
             public int getBoardSize() {
                 return game.getBoardSize();
             }
 
-            @Override
             public Map<CellPosition, Token> getBoard() {
                 return game.getBoard();
             }
 
-            @Override
             public Collection<Token> getRemainingTokens() {
                 return game.getRemainingTokens();
             }
 
-            @Override
             public Collection<Token> getRemovedTokens() {
                 return game.getRemovedTokens();
             }

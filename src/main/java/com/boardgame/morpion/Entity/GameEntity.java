@@ -7,20 +7,74 @@ import java.util.List;
 public class GameEntity {
 
     @Id
-    public String id;
+    private String id;
 
-    public int boardSize;
+    private int boardSize;
 
-    public String currentPlayerId;
+    private String currentPlayerId;
 
-    public String factoryId;
+    private String factoryId;
 
-    public String playerIds;
+    private String playerIds;
 
-    public String status;
+    private String status;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<GameTokenEntity> tokens;
+    private List<GameTokenEntity> tokens;
 
-    // Getters and setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getBoardSize() {
+        return boardSize;
+    }
+
+    public void setBoardSize(int boardSize) {
+        this.boardSize = boardSize;
+    }
+
+    public String getCurrentPlayerId() {
+        return currentPlayerId;
+    }
+
+    public void setCurrentPlayerId(String currentPlayerId) {
+        this.currentPlayerId = currentPlayerId;
+    }
+
+    public String getFactoryId() {
+        return factoryId;
+    }
+
+    public void setFactoryId(String factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public String getPlayerIds() {
+        return playerIds;
+    }
+
+    public void setPlayerIds(String playerIds) {
+        this.playerIds = playerIds;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<GameTokenEntity> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<GameTokenEntity> tokens) {
+        this.tokens = tokens;
+    }
 }
