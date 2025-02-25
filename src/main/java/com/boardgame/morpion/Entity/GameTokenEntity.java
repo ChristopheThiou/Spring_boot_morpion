@@ -1,18 +1,32 @@
 package com.boardgame.morpion.Entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 public class GameTokenEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    public @NotNull String ownerId;
-    public @NotNull String name;
-    public boolean removed;
-    public @Nullable Integer x;
-    public @Nullable Integer y;
+    public String name;
+
+    public String ownerId;
+
+    public Boolean removed;
+
+    public Integer x;
+
+    public Integer y;
+
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    public GameEntity game;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "parent_token_id")
+    public List<GameTokenEntity> tokens;
+
+    // Getters and setters
 }

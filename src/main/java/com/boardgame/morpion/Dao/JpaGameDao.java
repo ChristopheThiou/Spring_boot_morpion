@@ -45,6 +45,7 @@ public class JpaGameDao implements GameDao {
 
     private Game convertToGame(GameEntity gameEntity) {
         return new Game() {
+
             @Override
             public UUID getId() {
                 return UUID.fromString(gameEntity.id);
@@ -60,16 +61,6 @@ public class JpaGameDao implements GameDao {
                 return Arrays.stream(gameEntity.playerIds.split(","))
                              .map(UUID::fromString)
                              .collect(Collectors.toSet());
-            }
-
-            @Override
-            public GameStatus getStatus() {
-                return GameStatus.valueOf(gameEntity.status);
-            }
-
-            @Override
-            public UUID getCurrentPlayerId() {
-                return gameEntity.currentPlayerId != null ? UUID.fromString(gameEntity.currentPlayerId) : null;
             }
 
             @Override
@@ -89,23 +80,33 @@ public class JpaGameDao implements GameDao {
 
             @Override
             public Collection<Token> getRemainingTokens() {
-                return gameEntity.remainingTokens.stream()
-                                                 .map(this::convertToGameToken)
-                                                 .collect(Collectors.toList());
+                return gameEntity.tokens.stream()
+                                        .filter(token -> token.x == null && token.y == null)
+                                        .map(this::convertToGameToken)
+                                        .collect(Collectors.toList());
             }
 
             @Override
             public Collection<Token> getRemovedTokens() {
-                return gameEntity.removedTokens.stream()
-                                               .map(this::convertToGameToken)
-                                               .collect(Collectors.toList());
+                return Collections.emptyList(); // Retourne une collection vide si non implémenté
+            }
+
+            @Override
+            public @NotNull GameStatus getStatus() {
+                return GameStatus.valueOf(gameEntity.status);
+            }
+
+            @Override
+            public UUID getCurrentPlayerId() {
+                return gameEntity.currentPlayerId != null ? UUID.fromString(gameEntity.currentPlayerId) : null;
             }
 
             private Token convertToGameToken(GameTokenEntity gameTokenEntity) {
                 return new Token() {
+
                     @Override
                     public Optional<UUID> getOwnerId() {
-                        return Optional.ofNullable(UUID.fromString(gameTokenEntity.ownerId));
+                        return Optional.ofNullable(gameTokenEntity.ownerId != null ? UUID.fromString(gameTokenEntity.ownerId) : null);
                     }
 
                     @Override
@@ -122,13 +123,36 @@ public class JpaGameDao implements GameDao {
 
                     @Override
                     public Set<CellPosition> getAllowedMoves() {
-                        // Implémentez la logique pour obtenir les mouvements autorisés
-                        return new HashSet<>();
+                        Set<CellPosition> allowedMoves = new HashSet<>();
+                        int boardSize = gameEntity.boardSize;
+                        Map<CellPosition, Token> board = getBoard();
+
+                        CellPosition currentPosition = getPosition();
+                        if (currentPosition != null) {
+                            int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+                            for (int[] direction : directions) {
+                                int newX = currentPosition.x() + direction[0];
+                                int newY = currentPosition.y() + direction[1];
+                                if (newX >= 0 && newX < boardSize && newY >= 0 && newY < boardSize) {
+                                    CellPosition newPosition = new CellPosition(newX, newY);
+                                    if (!board.containsKey(newPosition)) {
+                                        allowedMoves.add(newPosition);
+                                    }
+                                }
+                            }
+                        }
+                        return allowedMoves;
                     }
 
                     @Override
                     public void moveTo(@NotNull CellPosition position) throws InvalidPositionException {
-                        // Implémentez la logique pour déplacer le token
+                        // Vérifiez que la position cible est vide avant de déplacer le token
+                        Map<CellPosition, Token> board = getBoard();
+                        if (board.containsKey(position)) {
+                            throw new InvalidPositionException("Position is already occupied");
+                        }
+                        gameTokenEntity.x = position.x();
+                        gameTokenEntity.y = position.y();
                     }
                 };
             }
@@ -145,22 +169,21 @@ public class JpaGameDao implements GameDao {
                                    .collect(Collectors.joining(","));
         gameEntity.status = game.getStatus().name();
         gameEntity.currentPlayerId = game.getCurrentPlayerId() != null ? game.getCurrentPlayerId().toString() : null;
-        gameEntity.tokens = game.getBoard().values().stream()
-                                .map(this::convertToGameTokenEntity)
-                                .collect(Collectors.toList());
-        gameEntity.remainingTokens = game.getRemainingTokens().stream()
-                                         .map(this::convertToGameTokenEntity)
-                                         .collect(Collectors.toList());
-        gameEntity.removedTokens = game.getRemovedTokens().stream()
-                                       .map(this::convertToGameTokenEntity)
-                                       .collect(Collectors.toList());
+        gameEntity.tokens = new ArrayList<>();
+        gameEntity.tokens.addAll(game.getBoard().values().stream()
+                                .map(token -> convertToGameTokenEntity(token, gameEntity))
+                                .collect(Collectors.toList()));
+        gameEntity.tokens.addAll(game.getRemainingTokens().stream()
+                                .map(token -> convertToGameTokenEntity(token, gameEntity))
+                                .collect(Collectors.toList()));
         return gameEntity;
     }
 
-    private GameTokenEntity convertToGameTokenEntity(Token token) {
+    private GameTokenEntity convertToGameTokenEntity(Token token, GameEntity gameEntity) {
         GameTokenEntity tokenEntity = new GameTokenEntity();
         tokenEntity.ownerId = token.getOwnerId().map(UUID::toString).orElse(null);
         tokenEntity.name = token.getName();
+        tokenEntity.game = gameEntity;
         if (token.getPosition() != null) {
             tokenEntity.x = token.getPosition().x();
             tokenEntity.y = token.getPosition().y();

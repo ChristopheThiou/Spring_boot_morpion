@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 
 @Service
@@ -37,8 +39,16 @@ public class GameCatalogImpl implements GameCatalog {
         playerIds.remove(userId);
         UUID opponentIds = playerIds.iterator().next();
         Game game = plugin.createGame(OptionalInt.of(playerCount), OptionalInt.of(boardSize), OptionalInt.empty(), OptionalInt.empty(), userId, opponentIds);
+
         gameDao.upsert(game);
-        return game;
+        
+        var savedGame = gameDao.findById(game.getId().toString()).orElseThrow();
+
+        // Ajout de journaux pour le débogage
+        System.out.println("Created game with ID: " + savedGame.getId());
+        System.out.println("Remaining Tokens: " + savedGame.getRemainingTokens());
+
+        return savedGame;
     }
 
     @Override
@@ -49,35 +59,46 @@ public class GameCatalogImpl implements GameCatalog {
     }
 
     @Override
+    @Transactional
     public void playMove(UUID gameId, UUID playerId, int x, int y) {
         Game game = gameDao.findById(gameId.toString())
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
-        if (game.getCurrentPlayerId().equals(playerId)) {
-            CellPosition position = new CellPosition(x, y);
-            // Vérifiez si la position est déjà occupée
-            if (game.getBoard().containsKey(position)) {
-                throw new InvalidMoveException("Position is already occupied");
-            }
-            Token token = game.getRemainingTokens().stream()
-                    .filter(t -> t.getOwnerId().orElse(null).equals(playerId))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("No token available for the player"));
-            try {
-                token.moveTo(position);
-                UUID newCurrentPlayerId = switchCurrentPlayer(game.getPlayerIds(), game.getCurrentPlayerId());
-                Game updatedGame = createUpdatedGame(game, newCurrentPlayerId);
-                gameDao.upsert(updatedGame);  // Assurez-vous que l'objet mis à jour est sauvegardé
-            } catch (InvalidPositionException e) {
-                throw new RuntimeException("Erreur lors du déplacement du jeton: " + e.getMessage(), e);
-            }
-        } else {
+        
+        if (!game.getCurrentPlayerId().equals(playerId)) {
             throw new IllegalArgumentException("Coup invalide ou joueur non autorisé.");
+        }
+
+        CellPosition position = new CellPosition(x, y);
+        // Vérifiez si la position est déjà occupée
+        if (game.getBoard().containsKey(position)) {
+            throw new InvalidMoveException("Position is already occupied");
+        }
+
+        // Ajout de journaux pour le débogage
+        System.out.println("Player ID: " + playerId);
+        System.out.println("Remaining Tokens: " + game.getRemainingTokens());
+
+        Token token = game.getRemainingTokens().stream()
+                .filter(t -> t.getOwnerId().orElse(null).equals(playerId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No token available for the player"));
+
+        try {
+            token.moveTo(position);
+            UUID newCurrentPlayerId = getNextPlayerId(game.getPlayerIds(), game.getCurrentPlayerId());
+            game.getBoard().put(position, token);
+            game.getRemainingTokens().remove(token);
+            gameDao.upsert(createUpdatedGame(game, newCurrentPlayerId));
+        } catch (InvalidPositionException e) {
+            throw new RuntimeException("Erreur lors du déplacement du jeton: " + e.getMessage(), e);
         }
     }
 
-    private UUID switchCurrentPlayer(Set<UUID> playerIds, UUID currentPlayerId) {
-        UUID[] playersArray = playerIds.toArray(new UUID[0]);
-        return playersArray[0].equals(currentPlayerId) ? playersArray[1] : playersArray[0];
+    private UUID getNextPlayerId(Set<UUID> playerIds, UUID currentPlayerId) {
+        List<UUID> playersList = new ArrayList<>(playerIds);
+        int currentIndex = playersList.indexOf(currentPlayerId);
+        int nextIndex = (currentIndex + 1) % playersList.size();
+        return playersList.get(nextIndex);
     }
 
     private Game createUpdatedGame(Game game, UUID newCurrentPlayerId) {
