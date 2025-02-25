@@ -27,7 +27,6 @@ public class GameController {
             throw new IllegalArgumentException("Invalid user ID");
         }
 
-        // Séparez les opponentIds et vérifiez qu'il y a exactement un joueur
         String[] opponentIdsArray = request.getOpponentIds().split(",");
         if (opponentIdsArray.length != 1) {
             throw new IllegalArgumentException("opponentIds must contain exactly one player");

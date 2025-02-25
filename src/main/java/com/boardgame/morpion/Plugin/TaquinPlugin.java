@@ -50,7 +50,7 @@ public class TaquinPlugin implements GamePlugin {
         System.out.println("Board size: " + size);
         System.out.println("Player IDs: " + playerIdsList);
 
-        return taquinGameFactory.createGame(3, Set.of(playerIds));
+        return taquinGameFactory.createGame(4, Set.of(playerIds));
     }
 
     @Override

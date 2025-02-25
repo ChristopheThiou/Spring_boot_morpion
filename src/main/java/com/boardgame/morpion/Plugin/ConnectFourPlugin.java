@@ -36,7 +36,6 @@ public class ConnectFourPlugin implements GamePlugin {
     public Game createGame(OptionalInt playerCount, OptionalInt boardSize, OptionalInt winCondition,
                            OptionalInt maxTurns, UUID... playerIds) {
         int players = playerCount.orElse(defaultPlayerCount);
-        int size = boardSize.orElse(3); // Taille par défaut
 
         // Créez une liste de UUID pour les joueurs en utilisant userId et opponentIds
         List<UUID> playerIdsList = new ArrayList<>();
@@ -47,10 +46,8 @@ public class ConnectFourPlugin implements GamePlugin {
         // Ajout de journaux pour le débogage
         System.out.println("Creating game with the following parameters:");
         System.out.println("Player count: " + players);
-        System.out.println("Board size: " + size);
-        System.out.println("Player IDs: " + playerIdsList);
 
-        return connectFourGameFactory.createGame(3, Set.of(playerIds));
+        return connectFourGameFactory.createGame(7, Set.of(playerIds));
     }
 
     @Override

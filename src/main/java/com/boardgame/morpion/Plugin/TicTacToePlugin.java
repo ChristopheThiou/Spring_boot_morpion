@@ -36,12 +36,10 @@ public class TicTacToePlugin implements GamePlugin {
     public Game createGame(OptionalInt playerCount, OptionalInt boardSize, OptionalInt winCondition,
                            OptionalInt maxTurns, UUID... playerIds) {
         int players = playerCount.orElse(defaultPlayerCount);
-        int size = boardSize.orElse(3); // Taille par défaut
 
         // Ajout de journaux pour le débogage
         System.out.println("Creating game with the following parameters:");
         System.out.println("Player count: " + players);
-        System.out.println("Board size: " + size);
 
 
         return ticTacToeGameFactory.createGame(3, Set.of(playerIds));
