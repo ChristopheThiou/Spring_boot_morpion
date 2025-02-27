@@ -1,8 +1,7 @@
-package com.boardgame.morpion.Service;
+package com.boardgame.morpion.Plugin;
 
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
-import fr.le_campus_numerique.square_games.engine.Token;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Optional;
@@ -21,22 +20,18 @@ public class TokenImpl implements Token {
         this.boardSize = boardSize;
     }
 
-    @Override
     public Optional<UUID> getOwnerId() {
         return Optional.ofNullable(ownerId);
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public CellPosition getPosition() {
         return position;
     }
 
-    @Override
     public Set<CellPosition> getAllowedMoves() {
         Set<CellPosition> allowedMoves = new HashSet<>();
         if (position != null) {
@@ -52,7 +47,6 @@ public class TokenImpl implements Token {
         return allowedMoves;
     }
 
-    @Override
     public void moveTo(@NotNull CellPosition position) throws InvalidPositionException {
         this.position = position;
     }

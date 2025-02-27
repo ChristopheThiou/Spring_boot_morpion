@@ -1,6 +1,5 @@
 package com.boardgame.morpion.Plugin;
 
-import com.boardgame.morpion.Service.TokenImpl;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.Token;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
