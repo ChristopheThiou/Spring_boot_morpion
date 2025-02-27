@@ -3,15 +3,16 @@ package com.boardgame.morpion.Service;
 import com.boardgame.morpion.Dao.GameDao;
 import com.boardgame.morpion.Exception.InvalidMoveException;
 import com.boardgame.morpion.Plugin.GamePlugin;
-import fr.le_campus_numerique.square_games.engine.*;
-
+import com.boardgame.morpion.Util.GameUtils;
+import fr.le_campus_numerique.square_games.engine.CellPosition;
+import fr.le_campus_numerique.square_games.engine.Game;
+import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
+import fr.le_campus_numerique.square_games.engine.Token;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 
 
 @Service
@@ -57,7 +58,7 @@ public class GameCatalogImpl implements GameCatalog {
     public void playMove(UUID gameId, UUID playerId, int x, int y) {
         Game game = gameDao.findById(gameId.toString())
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
-        
+
         if (!game.getCurrentPlayerId().equals(playerId)) {
             throw new IllegalArgumentException("Coup invalide ou joueur non autorisé.");
         }
@@ -82,7 +83,7 @@ public class GameCatalogImpl implements GameCatalog {
             UUID newCurrentPlayerId = getNextPlayerId(game.getPlayerIds(), game.getCurrentPlayerId());
             game.getBoard().put(position, token);
             game.getRemainingTokens().remove(token);
-            gameDao.upsert(createUpdatedGame(game, newCurrentPlayerId));
+            gameDao.upsert(GameUtils.createUpdatedGame(game, newCurrentPlayerId));
         } catch (InvalidPositionException e) {
             throw new RuntimeException("Erreur lors du déplacement du jeton: " + e.getMessage(), e);
         }
@@ -93,46 +94,5 @@ public class GameCatalogImpl implements GameCatalog {
         int currentIndex = playersList.indexOf(currentPlayerId);
         int nextIndex = (currentIndex + 1) % playersList.size();
         return playersList.get(nextIndex);
-    }
-
-    private Game createUpdatedGame(Game game, UUID newCurrentPlayerId) {
-        return new Game() {
-
-            public UUID getId() {
-                return game.getId();
-            }
-
-            public String getFactoryId() {
-                return game.getFactoryId();
-            }
-
-            public Set<UUID> getPlayerIds() {
-                return game.getPlayerIds();
-            }
-
-            public GameStatus getStatus() {
-                return game.getStatus();
-            }
-
-            public UUID getCurrentPlayerId() {
-                return newCurrentPlayerId;
-            }
-
-            public int getBoardSize() {
-                return game.getBoardSize();
-            }
-
-            public Map<CellPosition, Token> getBoard() {
-                return game.getBoard();
-            }
-
-            public Collection<Token> getRemainingTokens() {
-                return game.getRemainingTokens();
-            }
-
-            public Collection<Token> getRemovedTokens() {
-                return game.getRemovedTokens();
-            }
-        };
     }
 }
