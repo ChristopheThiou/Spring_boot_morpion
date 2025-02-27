@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -16,8 +15,11 @@ import org.springframework.stereotype.Repository;
 @Primary
 public class JpaGameDao implements GameDao {
 
-    @Autowired
-    private GameEntityRepository gameEntityRepository;
+    private final GameEntityRepository gameEntityRepository;
+
+    public JpaGameDao(GameEntityRepository gameEntityRepository) {
+        this.gameEntityRepository = gameEntityRepository;
+    }
 
     @Override
     public Stream<Game> findAll() {
@@ -81,7 +83,7 @@ public class JpaGameDao implements GameDao {
             }
 
             public Collection<Token> getRemovedTokens() {
-                return Collections.emptyList(); // Retourne une collection vide si non implémenté
+                return Collections.emptyList();
             }
 
             public @NotNull GameStatus getStatus() {
@@ -132,7 +134,6 @@ public class JpaGameDao implements GameDao {
                     }
 
                     public void moveTo(@NotNull CellPosition position) throws InvalidPositionException {
-                        // Vérifiez que la position cible est vide avant de déplacer le token
                         Map<CellPosition, Token> board = getBoard();
                         if (board.containsKey(position)) {
                             throw new InvalidPositionException("Position is already occupied");
@@ -158,10 +159,10 @@ public class JpaGameDao implements GameDao {
         gameEntity.setTokens(new ArrayList<>());
         gameEntity.getTokens().addAll(game.getBoard().values().stream()
                                 .map(token -> convertToGameTokenEntity(token, gameEntity))
-                                .collect(Collectors.toList()));
+                                .toList());
         gameEntity.getTokens().addAll(game.getRemainingTokens().stream()
                                 .map(token -> convertToGameTokenEntity(token, gameEntity))
-                                .collect(Collectors.toList()));
+                                .toList());
         return gameEntity;
     }
 
