@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Util;
+package com.boardgame.morpion.util;
 
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
@@ -6,6 +6,7 @@ import fr.le_campus_numerique.square_games.engine.GameStatus;
 import fr.le_campus_numerique.square_games.engine.Token;
 
 import java.util.*;
+
 
 
 public class GameUtils {

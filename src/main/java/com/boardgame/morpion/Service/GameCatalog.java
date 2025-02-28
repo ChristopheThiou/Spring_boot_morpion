@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Service;
+package com.boardgame.morpion.service;
 
 import fr.le_campus_numerique.square_games.engine.Game;
 import java.util.Collection;

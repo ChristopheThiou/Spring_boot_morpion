@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Config;
+package com.boardgame.morpion.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;

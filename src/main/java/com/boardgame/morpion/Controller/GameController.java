@@ -1,8 +1,8 @@
-package com.boardgame.morpion.Controller;
+package com.boardgame.morpion.controller;
 
-import com.boardgame.morpion.Dto.GameDto;
-import com.boardgame.morpion.Service.GameCatalog;
-import com.boardgame.morpion.Service.UserService;
+import com.boardgame.morpion.dto.GameDto;
+import com.boardgame.morpion.service.GameCatalog;
+import com.boardgame.morpion.service.UserService;
 import fr.le_campus_numerique.square_games.engine.Game;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+
 
 @RestController
 @RequestMapping("/api/games")

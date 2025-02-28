@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Config;
+package com.boardgame.morpion.config;
 
 import fr.le_campus_numerique.square_games.engine.connectfour.ConnectFourGameFactory;
 import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;

@@ -1,9 +1,9 @@
-package com.boardgame.morpion.Service;
+package com.boardgame.morpion.service;
 
-import com.boardgame.morpion.Dao.GameDao;
-import com.boardgame.morpion.Exception.InvalidMoveException;
-import com.boardgame.morpion.Plugin.GamePlugin;
-import com.boardgame.morpion.Util.GameUtils;
+import com.boardgame.morpion.plugin.GamePlugin;
+import com.boardgame.morpion.dao.GameDao;
+import com.boardgame.morpion.exception.InvalidMoveException;
+import com.boardgame.morpion.util.GameUtils;
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
+
+
 
 
 @Service

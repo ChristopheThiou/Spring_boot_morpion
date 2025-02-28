@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Dto;
+package com.boardgame.morpion.dto;
 
 public class GameDto {
     private String gameId;

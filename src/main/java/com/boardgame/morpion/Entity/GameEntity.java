@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Entity;
+package com.boardgame.morpion.entity;
 
 import jakarta.persistence.*;
 import java.util.List;

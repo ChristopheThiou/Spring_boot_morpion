@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Dao;
+package com.boardgame.morpion.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

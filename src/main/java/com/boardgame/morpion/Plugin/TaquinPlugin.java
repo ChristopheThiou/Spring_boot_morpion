@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Plugin;
+package com.boardgame.morpion.plugin;
 
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.Token;

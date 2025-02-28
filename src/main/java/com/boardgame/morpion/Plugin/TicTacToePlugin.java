@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Plugin;
+package com.boardgame.morpion.plugin;
 
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.Token;
@@ -41,7 +41,7 @@ public class TicTacToePlugin implements GamePlugin {
         System.out.println("Player count: " + players);
 
 
-        return ticTacToeGameFactory.createGame(3, Set.of(playerIds));
+        return ticTacToeGameFactory.createGame(boardSize.orElse(3), Set.of(playerIds));
     }
 
     @Override

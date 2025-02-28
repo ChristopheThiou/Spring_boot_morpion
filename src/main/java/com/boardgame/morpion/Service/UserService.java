@@ -1,12 +1,13 @@
-package com.boardgame.morpion.Service;
+package com.boardgame.morpion.service;
 
-import com.boardgame.morpion.Dto.UserDto;
+import com.boardgame.morpion.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
 
 
 @Service

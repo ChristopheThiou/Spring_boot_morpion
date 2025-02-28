@@ -1,8 +1,8 @@
-package com.boardgame.morpion.Dao;
+package com.boardgame.morpion.dao;
 
-import com.boardgame.morpion.Entity.GameEntity;
-import com.boardgame.morpion.Entity.GameTokenEntity;
-import com.boardgame.morpion.Repository.GameEntityRepository;
+import com.boardgame.morpion.entity.GameEntity;
+import com.boardgame.morpion.entity.GameTokenEntity;
+import com.boardgame.morpion.repository.GameEntityRepository;
 import fr.le_campus_numerique.square_games.engine.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+
+
 
 @Repository
 @Primary

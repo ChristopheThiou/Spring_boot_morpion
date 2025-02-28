@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Dto;
+package com.boardgame.morpion.dto;
 
 public class UserDto {
     private String userId;

@@ -1,7 +1,8 @@
-package com.boardgame.morpion.Plugin;
+package com.boardgame.morpion.plugin;
 
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
+import fr.le_campus_numerique.square_games.engine.Token;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Optional;

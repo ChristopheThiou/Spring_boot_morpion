@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Dao;
+package com.boardgame.morpion.dao;
 
 import fr.le_campus_numerique.square_games.engine.Game;
 import jakarta.validation.constraints.NotNull;

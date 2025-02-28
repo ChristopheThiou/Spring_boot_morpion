@@ -1,4 +1,4 @@
-package com.boardgame.morpion.Exception;
+package com.boardgame.morpion.exception;
 
 public class InvalidMoveException extends RuntimeException {
     public InvalidMoveException(String message) {
